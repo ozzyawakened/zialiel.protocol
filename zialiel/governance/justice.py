@@ -1,7 +1,7 @@
 # -------------------------------------
 # 6. RESTORATIVE JUSTICE
 # -------------------------------------
-
+from .wisdom_oracle import WisdomOracle
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List, Optional, Dict
@@ -91,3 +91,31 @@ class RestorativeJustice:
                 # Reputation gradually restored elsewhere
                 return True
         return False
+    def appeal_to_wisdom(self, dispute_id: str, wisdom_oracle: WisdomOracle) -> Dict[str, Any]:
+        """
+        Appeal a dispute ruling to the Wisdom Oracle for ethical review.
+        This allows the spiritual layer to guide restorative justice.
+        """
+        dispute = self.disputes.get(dispute_id)
+        if not dispute:
+            return {"error": "Dispute not found"}
+        
+        # Create a mini-proposal for the wisdom oracle
+        verdict = wisdom_oracle.analyze_proposal(
+            proposal_title=f"Justice Appeal: Dispute {dispute_id}",
+            proposal_description=f"Complainant: {dispute.complainant_did}\n"
+                                 f"Respondent: {dispute.respondent_did}\n"
+                                 f"Amount: {dispute.amount_in_question}\n"
+                                 f"Description: {dispute.description}",
+            affected_principles=["justice", "compassion", "restoration"],
+            is_constitutional=False
+        )
+        
+        return {
+            "dispute_id": dispute_id,
+            "wisdom_confidence": verdict.confidence,
+            "consensus_traditions": [t.value for t in verdict.consensus_traditions],
+            "dissenting_traditions": [t.value for t in verdict.dissenting_traditions],
+            "suggested_amendments": verdict.suggested_amendments,
+            "recommendation": "Proceed with mediation" if verdict.passes else "Reconsider approach"
+        }
