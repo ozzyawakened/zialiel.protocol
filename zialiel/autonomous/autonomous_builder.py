@@ -90,3 +90,4 @@ class AutonomousBuilder:
 # Run it
 builder = AutonomousBuilder("0x...", "...")
 builder.listen_and_create()
+rm autonomous_builder.py
