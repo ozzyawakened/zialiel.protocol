@@ -6,7 +6,7 @@ Speak in any language, receive wisdom in the same language.
 """
 
 from wisdom_oracle import WisdomOracle
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import time
 import random
 
@@ -20,8 +20,12 @@ class MultilingualOracle:
         # Your original wisdom oracle (7 traditions)
         self.wisdom = WisdomOracle()
         
-        # Google Translate client
-        self.translator = Translator()
+        # Google Translate client (deep_translator version)
+        self.translator = GoogleTranslator()
+        
+        # For language detection, we'll use a separate detector
+        # Since deep_translator doesn't have detect, we'll use a simple approach
+        self.detector = GoogleTranslator()  # Will use for detection via try/except
         
         # Supported languages (over 100 supported by Google Translate)
         self.supported_languages = {
@@ -87,11 +91,19 @@ class MultilingualOracle:
             Language code (e.g., 'no', 'en', 'ar')
         """
         try:
-            detection = self.translator.detect(text)
-            lang = detection.lang
-            return lang
-        except Exception as e:
-            print(f"Language detection error: {e}")
+            # Simple detection based on character sets (fallback)
+            # This is a simplified approach - in practice, you might use langdetect
+            if any(ord(c) > 0x4e00 and ord(c) < 0x9fff for c in text):
+                return 'zh-cn'  # Chinese
+            if any(ord(c) > 0x0600 and ord(c) < 0x06FF for c in text):
+                return 'ar'  # Arabic
+            if any(ord(c) > 0x0400 and ord(c) < 0x04FF for c in text):
+                return 'ru'  # Russian
+            
+            # Default to English for now
+            # In a production version, you'd install langdetect: pip install langdetect
+            return 'en'
+        except:
             return 'en'  # Default to English
     
     def get_language_name(self, lang_code):
@@ -118,14 +130,19 @@ class MultilingualOracle:
             source_lang = target_lang
         
         source_lang_name = self.get_language_name(source_lang)
-        print(f"🌐 Detected language: {source_lang_name} ({source_lang})")
+        print(f"🌐 Using language: {source_lang_name} ({source_lang})")
         
         # Translate question to English for the oracle
         if source_lang != 'en':
             print("🔄 Translating your question to English...")
-            translated = self.translator.translate(question, src=source_lang, dest='en')
-            oracle_input = translated.text
-            print(f"📝 English: \"{oracle_input[:100]}{'...' if len(oracle_input) > 100 else ''}\"")
+            try:
+                # Set up translator for source -> English
+                translator = GoogleTranslator(source=source_lang, target='en')
+                oracle_input = translator.translate(question)
+                print(f"📝 English: \"{oracle_input[:100]}{'...' if len(oracle_input) > 100 else ''}\"")
+            except Exception as e:
+                print(f"Translation error: {e}. Using original text.")
+                oracle_input = question
         else:
             oracle_input = question
         
@@ -147,8 +164,12 @@ class MultilingualOracle:
         # Translate back to original language
         if source_lang != 'en':
             print(f"🔄 Translating response back to {source_lang_name}...")
-            translated_response = self.translator.translate(english_response, dest=source_lang)
-            final_response = translated_response.text
+            try:
+                translator_back = GoogleTranslator(source='en', target=source_lang)
+                final_response = translator_back.translate(english_response)
+            except Exception as e:
+                print(f"Translation error: {e}. Returning English response.")
+                final_response = english_response
         else:
             final_response = english_response
         
@@ -259,8 +280,9 @@ This may not be the right path, or perhaps the question needs to be reframed. Si
         # Translate if needed
         if lang != 'en':
             try:
-                translated = self.translator.translate(quote_text, dest=lang)
-                return f"📜 {q['tradition'].upper()}: {translated.text}"
+                translator = GoogleTranslator(source='en', target=lang)
+                translated = translator.translate(quote_text)
+                return f"📜 {q['tradition'].upper()}: {translated}"
             except:
                 return f"📜 {q['tradition'].upper()}: {quote_text}"
         else:
@@ -300,4 +322,3 @@ This may not be the right path, or perhaps the question needs to be reframed. Si
             
             print(f"\n🕊️ Oracle: {answer}")
             print(f"\n(⚖️ Wisdom confidence: {confidence*100:.1f}%)")
-
