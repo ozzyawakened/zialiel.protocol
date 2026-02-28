@@ -1,1 +1,10 @@
 oqs
+# Quantum-safe cryptography
+oqs
+
+# Oracle interfaces
+openai
+google-translate
+ipfshttpclient
+web3
+python-dotenv
