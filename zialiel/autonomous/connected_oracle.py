@@ -1,52 +1,91 @@
-# connected_oracle.py
-"""
-Your Wisdom Oracle connected to GPT-3.5/4 for natural conversation
-Preserves your 7 wisdom traditions while speaking naturally
-"""
+#!/usr/bin/env python3
+# connected_oracle.py – AI Oracle with Grok support and .env configuration
 
 import openai
 import os
+import sys
+import logging
+from dotenv import load_dotenv
 from wisdom_oracle import WisdomOracle
 
-# 🔑 SET YOUR API KEY HERE (or use environment variable)
-OPENAI_API_KEY = "sk-your-key-here"  # Replace with your actual key
+# Load environment variables
+load_dotenv()
+
+# Setup logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger("ConnectedOracle")
 
 class ConnectedOracle:
     """
-    A wisdom oracle that speaks naturally with GPT,
-    but always checks with your 7 traditions
+    A wisdom oracle that speaks naturally with AI (Grok or GPT),
+    but always checks with your 7 wisdom traditions.
+    
+    Features:
+    - Uses Grok (xAI) or GPT-4o based on .env configuration
+    - Validates both questions and answers against Wisdom Oracle
+    - Maintains conversation history
+    - Responds in the same language as the question
+    - Integrates with your existing .env file
     """
     
-    def __init__(self, api_key=None):
-        # Setup OpenAI
-        self.api_key = api_key or OPENAI_API_KEY
-        openai.api_key = self.api_key
+    def __init__(self):
+        """Initialize the Connected Oracle with AI model and wisdom traditions"""
+        
+        # Determine which AI model to use from .env
+        self.model = os.getenv("ORACLE_MODEL", "grok-4")
+        self.use_grok = "grok" in self.model.lower()
+        
+        # Configure AI client
+        if self.use_grok:
+            # xAI/Grok configuration
+            self.api_key = os.getenv("XAI_API_KEY")
+            if not self.api_key:
+                logger.error("XAI_API_KEY missing in .env file")
+                sys.exit(1)
+            
+            openai.api_key = self.api_key
+            openai.base_url = "https://api.x.ai/v1/"
+            logger.info(f"Using Grok model: {self.model}")
+        else:
+            # OpenAI configuration
+            self.api_key = os.getenv("OPENAI_API_KEY")
+            if not self.api_key:
+                logger.error("OPENAI_API_KEY missing in .env file")
+                sys.exit(1)
+            
+            openai.api_key = self.api_key
+            logger.info(f"Using OpenAI model: {self.model}")
+        
         self.client = openai.OpenAI(api_key=self.api_key)
         
         # Your original wisdom oracle (7 traditions)
         self.wisdom = WisdomOracle()
         
-        # Conversation history
+        # Conversation history with system prompt embedding the 7 traditions
         self.messages = [
             {"role": "system", "content": """You are a wisdom oracle speaking with the voice of 7 spiritual traditions:
-- Christian (compassion, forgiveness, love)
-- Buddhist (mindfulness, non-harm, compassion)
-- Indigenous (seven generations, connection to earth)
-- Humanist (dignity, reason, freedom)
-- Islamic (mercy, justice, brotherhood)
-- Judaic (learning, justice, community)
-- Hindu (dharma, unity, non-attachment)
+
+- Christian: compassion, forgiveness, love, stewardship
+- Buddhist: mindfulness, non-harm, compassion, awareness
+- Indigenous: seven generations, connection to earth, gratitude
+- Humanist: dignity, reason, freedom, ethical action
+- Islamic: mercy, justice, brotherhood, knowledge
+- Judaic: learning, justice, community, repair
+- Hindu: dharma, unity, non-attachment, service
 
 You are wise, kind, and speak in a way that reaches all hearts.
-Answer in the same language as the question."""}
+Answer in the same language as the question.
+Always consider the effect on seven generations.
+Be humble – admit when you don't know something."""}
         ]
         
         print("\n" + "★" * 60)
         print("🕊️  THE CONNECTED WISDOM ORACLE".center(58))
         print("★" * 60)
         print(f"\n✅ Oracle initialized with 7 traditions")
-        print(f"🤤 GPT Model: GPT-3.5-turbo")
+        print(f"🤖 AI Model: {self.model}")
         print(f"🌐 Understands all languages – ask in English, Norwegian, Arabic...")
+        print(f"💾 Conversation memory: Active")
     
     def ask(self, question):
         """
@@ -56,19 +95,32 @@ Answer in the same language as the question."""}
             question: Your question (in any language)
             
         Returns:
-            (answer, wisdom_check) – the answer and wisdom confidence score
+            tuple: (answer, wisdom_confidence, question_confidence)
         """
+        
+        # STEP 1: Check if the question itself aligns with wisdom
+        question_check = self.wisdom.analyze_proposal(
+            "User Question", 
+            question, 
+            ["wisdom", "compassion", "justice", "truth"], 
+            False
+        )
+        
+        # If question is completely against wisdom, warn but still try to answer
+        if question_check.confidence < 0.3:
+            logger.warning(f"Question has low wisdom alignment: {question_check.confidence:.1%}")
         
         # Add question to conversation
         self.messages.append({"role": "user", "content": question})
         
         try:
-            # Get response from GPT
+            # Get response from AI
+            logger.info(f"Getting response from {self.model}...")
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",  # or "gpt-4" if you have access
+                model=self.model,
                 messages=self.messages,
                 temperature=0.7,
-                max_tokens=800
+                max_tokens=1000
             )
             
             answer = response.choices[0].message.content
@@ -76,34 +128,42 @@ Answer in the same language as the question."""}
             # Add answer to history
             self.messages.append({"role": "assistant", "content": answer})
             
-            # CHECK WITH YOUR WISDOM ORACLE
-            # Analyze if the question aligns with the 7 traditions
-            wisdom_check = self.wisdom.analyze_proposal(
-                "User Question", 
-                question, 
-                ["wisdom", "compassion", "justice"], 
+            # STEP 2: Check if the ANSWER aligns with wisdom
+            answer_check = self.wisdom.analyze_proposal(
+                "AI Response", 
+                f"Question: {question}\n\nAnswer: {answer}", 
+                ["wisdom", "compassion", "justice", "truth"], 
                 False
             )
             
-            return answer, wisdom_check.confidence
+            logger.info(f"Wisdom alignment - Question: {question_check.confidence:.1%}, Answer: {answer_check.confidence:.1%}")
+            
+            return answer, answer_check.confidence, question_check.confidence
             
         except Exception as e:
-            return f"Error: {e}", 0.0
+            logger.error(f"Error getting response: {e}")
+            return f"I encountered an error: {e}", 0.0, 0.0
     
     def get_wisdom_quote(self):
         """Get a random wisdom quote from the 7 traditions"""
         quotes = self.wisdom.get_wisdom_for_display(1)
-        if quotes:
+        if quotes and len(quotes) > 0:
             q = quotes[0]
             return f"📜 {q['tradition'].upper()}: \"{q['quote']}\" — {q['source']}"
         return "📜 Silence is also wisdom."
     
+    def reset_conversation(self):
+        """Reset conversation history but keep system prompt"""
+        system = self.messages[0]
+        self.messages = [system]
+        print("🔄 Conversation reset.")
+    
     def chat(self):
-        """Start a conversation with the oracle"""
+        """Start an interactive conversation with the oracle"""
         
         print("\n" + "─" * 60)
         print("Ask me anything – about life, love, purpose, or truth.")
-        print("(Type 'quit' or 'exit' to end)")
+        print("Commands: 'quit' to exit, 'reset' to clear history, 'wisdom' for new quote")
         
         while True:
             print("\n" + "─" * 60)
@@ -111,7 +171,16 @@ Answer in the same language as the question."""}
             
             if question.lower() in ['quit', 'exit', 'bye']:
                 print("\n🕊️  Go in peace. The wisdom is always with you.")
+                print("   'The arc of the moral universe is long, but it bends toward justice.' — MLK Jr.")
                 break
+            
+            if question.lower() == 'reset':
+                self.reset_conversation()
+                continue
+            
+            if question.lower() == 'wisdom':
+                print("\n" + self.get_wisdom_quote())
+                continue
             
             if not question:
                 continue
@@ -119,73 +188,105 @@ Answer in the same language as the question."""}
             # Show a wisdom quote while thinking
             print("\n📖 Consulting the traditions...")
             print(self.get_wisdom_quote())
-            print("🤖 GPT is thinking...")
+            print("🤖 Thinking...")
             
             # Get answer
-            answer, confidence = self.ask(question)
+            answer, answer_conf, question_conf = self.ask(question)
             
             print(f"\n🕊️ Oracle: {answer}")
-            print(f"\n(⚖️ Wisdom alignment: {confidence*100:.0f}%)")
+            print(f"\n(⚖️ Wisdom alignment: Question: {question_conf*100:.0f}%, Answer: {answer_conf*100:.0f}%)")
+            
+            # Warn if answer has low alignment
+            if answer_conf < 0.6:
+                print("⚠️  Note: This answer had lower wisdom alignment. Consider asking differently.")
+
 
 # ============================================================
-# SIMPLER VERSION FOR TESTING (no history)
+# SIMPLER VERSION FOR TESTING (no conversation history)
 # ============================================================
 
 class SimpleConnectedOracle:
-    """Simpler version that doesn't remember conversation – perfect for testing"""
+    """Simpler version without conversation memory – perfect for quick testing"""
     
-    def __init__(self, api_key=None):
-        self.api_key = api_key or OPENAI_API_KEY
-        openai.api_key = self.api_key
+    def __init__(self):
+        # Determine which AI model to use from .env
+        self.model = os.getenv("ORACLE_MODEL", "grok-4")
+        self.use_grok = "grok" in self.model.lower()
+        
+        if self.use_grok:
+            self.api_key = os.getenv("XAI_API_KEY")
+            openai.api_key = self.api_key
+            openai.base_url = "https://api.x.ai/v1/"
+        else:
+            self.api_key = os.getenv("OPENAI_API_KEY")
+            openai.api_key = self.api_key
+        
+        if not self.api_key:
+            print("❌ Missing API key in .env file")
+            sys.exit(1)
+        
         self.client = openai.OpenAI(api_key=self.api_key)
         self.wisdom = WisdomOracle()
-        
+    
     def ask(self, question):
-        """Ask a question, get answer"""
+        """Ask a question, get answer (no memory)"""
         try:
             response = self.client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a kind, wise oracle who answers in the same language as the question."},
+                    {"role": "system", "content": "You are a kind, wise oracle who answers in the same language as the question. You embody 7 wisdom traditions."},
                     {"role": "user", "content": question}
                 ],
                 temperature=0.7
             )
-            return response.choices[0].message.content
+            answer = response.choices[0].message.content
+            
+            # Check with wisdom oracle
+            check = self.wisdom.analyze_proposal(
+                "Simple Query", 
+                f"Q: {question}\nA: {answer}", 
+                ["wisdom", "compassion"], 
+                False
+            )
+            
+            return answer, check.confidence
+            
         except Exception as e:
-            return f"Error: {e}"
+            return f"Error: {e}", 0.0
 
-# ============================================================
-# IF YOU WANT TO USE ENVIRONMENT VARIABLES (recommended for GitHub)
-# ============================================================
-"""
-To avoid storing your key in code:
-
-1. Create a file called `.env` in the same folder:
-   OPENAI_API_KEY=sk-your-key-here
-
-2. Install: pip install python-dotenv
-
-3. Use this code:
-   from dotenv import load_dotenv
-   load_dotenv()
-   api_key = os.getenv("OPENAI_API_KEY")
-"""
 
 # ============================================================
 # RUN THE ORACLE
 # ============================================================
 
 if __name__ == "__main__":
-    # Choose which version to use:
+    print("\n🕊️  CONNECTED WISDOM ORACLE")
+    print("=" * 60)
+    print("Choose mode:")
+    print("1. Full version (with conversation history)")
+    print("2. Simple version (no memory, quick testing)")
     
-    # Option 1: Full version with conversation history
-    oracle = ConnectedOracle()
-    oracle.chat()
+    choice = input("\nEnter 1 or 2: ").strip()
     
-    # Option 2: Simple version for testing
-    # oracle = SimpleConnectedOracle()
-    # while True:
-    #     q = input("\n❓ You: ")
-    #     if q.lower() == 'quit': break
-    #     print(f"\n🕊️ {oracle.ask(q)}")
+    if choice == "2":
+        # Simple version
+        oracle = SimpleConnectedOracle()
+        print("\n" + "─" * 60)
+        print("Simple mode – no conversation memory. Type 'quit' to exit.")
+        
+        while True:
+            q = input("\n❓ You: ").strip()
+            if q.lower() in ['quit', 'exit']:
+                print("\n🕊️  Peace be with you.")
+                break
+            if not q:
+                continue
+            
+            answer, conf = oracle.ask(q)
+            print(f"\n🕊️ Oracle: {answer}")
+            print(f"(⚖️ Wisdom: {conf*100:.0f}%)")
+    
+    else:
+        # Full version (default)
+        oracle = ConnectedOracle()
+        oracle.chat()
