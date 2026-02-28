@@ -1,0 +1,143 @@
+# talk_to_oracle.py
+"""
+A natural language interface for the Wisdom Oracle.
+Speak to the oracle in plain English, and receive wisdom from 7 traditions.
+"""
+
+from wisdom_oracle import WisdomOracle
+import time
+
+def print_wisdom_quote(oracle):
+    """Display a random wisdom quote"""
+    quotes = oracle.get_wisdom_for_display(1)
+    if quotes:
+        q = quotes[0]
+        print(f"\n📜 {q['tradition'].upper()}: \"{q['quote']}\" — {q['source']}")
+
+def analyze_question(oracle, question):
+    """Analyze a natural language question through the Wisdom Oracle"""
+    
+    # Simple keyword-to-principle mapping
+    keyword_map = {
+        "justice": ["justice", "fair", "right", "equality", "discrimination"],
+        "compassion": ["compassion", "kind", "mercy", "forgive", "help", "care"],
+        "stewardship": ["stewardship", "environment", "nature", "earth", "future", "generation"],
+        "freedom": ["freedom", "liberty", "choice", "autonomy", "free"],
+        "community": ["community", "together", "share", "collective", "society"],
+        "truth": ["truth", "honest", "real", "authentic", "wisdom"],
+        "gratitude": ["gratitude", "thank", "grateful", "appreciation"],
+        "dignity": ["dignity", "respect", "honor", "value", "worth"]
+    }
+    
+    # Extract principles from question
+    principles = []
+    question_lower = question.lower()
+    
+    for principle, keywords in keyword_map.items():
+        if any(k in question_lower for k in keywords):
+            principles.append(principle)
+    
+    # Default if no principles found
+    if not principles:
+        principles = ["wisdom"]
+    
+    print(f"\n🔍 Analyzing through principles: {', '.join(principles)}")
+    time.sleep(1)
+    
+    # Ask the oracle
+    result = oracle.analyze_proposal(
+        proposal_title="User Question",
+        proposal_description=question,
+        affected_principles=principles,
+        is_constitutional=False
+    )
+    
+    return result
+
+def display_answer(result):
+    """Display the oracle's answer in a beautiful format"""
+    
+    print("\n" + "=" * 60)
+    print("🕊️  THE WISDOM ORACLE RESPONDS")
+    print("=" * 60)
+    
+    # Confidence as a visual bar
+    confidence = result.confidence
+    bar_length = 40
+    filled = int(confidence * bar_length)
+    bar = "█" * filled + "░" * (bar_length - filled)
+    
+    print(f"\n📊 CONFIDENCE: {confidence*100:.1f}%")
+    print(f"   [{bar}]")
+    
+    # Consensus traditions
+    if result.consensus_traditions:
+        print(f"\n✅ TRADITIONS IN AGREEMENT:")
+        for t in result.consensus_traditions[:3]:  # Show first 3
+            print(f"   • {t.value.title()}")
+        if len(result.consensus_traditions) > 3:
+            print(f"   • ...and {len(result.consensus_traditions)-3} more")
+    
+    # Dissenting traditions
+    if result.dissenting_traditions:
+        print(f"\n⚠️  TRADITIONS WITH RESERVATIONS:")
+        for t in result.dissenting_traditions[:2]:
+            print(f"   • {t.value.title()}")
+        if len(result.dissenting_traditions) > 2:
+            print(f"   • ...and {len(result.dissenting_traditions)-2} more")
+    
+    # Wisdom guidance
+    if result.suggested_amendments:
+        print(f"\n💡 WISDOM GUIDANCE:")
+        print(f"   {result.suggested_amendments[0]}")
+    
+    # Verdict
+    print("\n" + "=" * 60)
+    if result.passes:
+        print("✨ VERDICT: The wisdom traditions see alignment with your question.")
+    else:
+        print("🌙 VERDICT: Consider deeper reflection. Wisdom suggests caution.")
+    print("=" * 60)
+
+def main():
+    """Main conversation loop"""
+    
+    oracle = WisdomOracle()
+    
+    print("\n" + "★" * 60)
+    print("🕊️  THE WISDOM ORACLE".center(58))
+    print("★" * 60)
+    print("\nI speak with the voice of 7 traditions:")
+    print("  ✝️  Christian  ☸️  Buddhist  🌍  Indigenous")
+    print("  🕊️  Humanist   ☪️  Islamic   ✡️  Judaic   🕉️  Hindu")
+    print("\nAsk me anything about justice, compassion, truth, or the path forward.")
+    print("(Type 'quit', 'exit', or 'bye' to leave)")
+    
+    while True:
+        print("\n" + "─" * 60)
+        question = input("❓ Your question: ").strip()
+        
+        if question.lower() in ['quit', 'exit', 'bye', 'avslutt']:
+            print("\n🕊️  Go in peace. The wisdom is always with you.")
+            break
+        
+        if not question:
+            continue
+        
+        # Show a random wisdom quote while thinking
+        print("\n📖 Consulting the traditions...")
+        time.sleep(1)
+        print_wisdom_quote(oracle)
+        time.sleep(1)
+        
+        # Analyze the question
+        result = analyze_question(oracle, question)
+        
+        # Display the answer
+        display_answer(result)
+        
+        # Offer follow-up
+        print("\n💭 Would you like to ask something else?")
+
+if __name__ == "__main__":
+    main()
