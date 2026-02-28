@@ -81,30 +81,38 @@ class MultilingualOracle:
         print(f"🇳🇴 You can speak Norwegian, English, Arabic, Chinese...")
     
     def detect_language(self, text):
-        """
-        Detect the language of the input text
+    """
+    Detect the language of the input text
+    
+    Args:
+        text: The text to detect language for
         
-        Args:
-            text: The text to detect language for
-            
-        Returns:
-            Language code (e.g., 'no', 'en', 'ar')
-        """
-        try:
-            # Simple detection based on character sets (fallback)
-            # This is a simplified approach - in practice, you might use langdetect
-            if any(ord(c) > 0x4e00 and ord(c) < 0x9fff for c in text):
-                return 'zh-cn'  # Chinese
-            if any(ord(c) > 0x0600 and ord(c) < 0x06FF for c in text):
-                return 'ar'  # Arabic
-            if any(ord(c) > 0x0400 and ord(c) < 0x04FF for c in text):
-                return 'ru'  # Russian
-            
-            # Default to English for now
-            # In a production version, you'd install langdetect: pip install langdetect
-            return 'en'
-        except:
-            return 'en'  # Default to English
+    Returns:
+        Language code (e.g., 'no', 'en', 'ar')
+    """
+    try:
+        # Try using langdetect if available (much more accurate)
+        from langdetect import detect
+        return detect(text)
+    except ImportError:
+        # Fall back to character detection
+        pass
+    except:
+        pass
+    
+    # Fallback: Simple detection based on character sets
+    try:
+        if any(ord(c) > 0x4e00 and ord(c) < 0x9fff for c in text):
+            return 'zh-cn'  # Chinese
+        if any(ord(c) > 0x0600 and ord(c) < 0x06FF for c in text):
+            return 'ar'  # Arabic
+        if any(ord(c) > 0x0400 and ord(c) < 0x04FF for c in text):
+            return 'ru'  # Russian
+    except:
+        pass
+    
+    # Default to English
+    return 'en'
     
     def get_language_name(self, lang_code):
         """Get the full language name from a language code"""
