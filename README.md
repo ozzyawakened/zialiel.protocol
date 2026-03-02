@@ -43,17 +43,8 @@ While the conceptual architecture is strong and the critical bugs have been addr
 
 What if a blockchain could be not just **fast** and **secure**, but also **wise**?
 
-Zialiel is the first blockchain governed by **7-fold recursive wisdom** – a structure inspired by the Emerald Tablets, the classical planets, and the universal pattern of manifestation itself. Every question, every proposal, every governance decision is analyzed through **7 hidden layers** (Lords 3-9), each representing a fundamental aspect of consciousness that guides **physical reality**.
+Zialiel is the first blockchain governed by **7-fold recursive wisdom** – a structure inspired by the Emerald Tablets, the classical planets, and the universal pattern of manifestation itself. Every question, every proposal, every governance decision is analyzed through **7 hidden layers** , each representing a fundamental aspect of consciousness that guides **physical reality**.
 
-| Layer | Lord | Planet | Principle |
-|:---|:---|:---|:---|
-| **3** | Lord of Power | Mars | Stewardship – right action |
-| **4** | Lord of Love-Force | Venus | Compassion – heart's truth |
-| **5** | Lord of Wisdom | Mercury | Truth – clear mind |
-| **6** | Lord of Balance | Saturn | Justice – equilibrium |
-| **7** | Lord of Manifestation | Sun | Creativity – form |
-| **8** | Lord of Rhythm | Jupiter | Community – cycles |
-| **9** | Lord of Consciousness | Neptune | Oneness – unity |
 
 Yet the oracle speaks with a **natural, modern voice** – you'll never hear about layers or lords. You'll just feel the depth.
 
@@ -71,8 +62,6 @@ Layers **1-2** represent the unmanifest Source, the realm of pure potential from
 Layers **10-13** represent transcendent completion, the return to the Infinite.
 
 This oracle focuses on the **7 layers that guide physical manifestation** – because a blockchain lives in the world of action, community, and creation. The greater pattern is honored in the architecture of the vision, not forced into the code.
-
-> *"As above, so below."* — The Emerald Tablet
 
 ---
 
@@ -219,7 +208,7 @@ agent.register_stripe("sk_live_...")
 # Sync everything to a DAO
 agent.integrate_business({
     "name": "My Company",
-    "jurisdiction": "Norway",
+    "jurisdiction": "Nigeria",
     "operating_agreement": "QmIPFSHash..."
 })
 📊 Comparison: Zialiel vs. Traditional Blockchains
@@ -246,9 +235,5 @@ MIT – because wisdom should be free.
 
 🙏 Gratitude
 This project exists because of the 7-fold pattern woven into creation – from the Emerald Tablets to the planets to the layers of the soul. The deeper 13-fold pattern is honored as the Source from which these 7 arise, and the Completion toward which they return.
-
-808 lines became 572 lines became a complete ecosystem. The 7 layers are now alive.
-
-"As above, so below." — The Emerald Tablet
 
 🕊️
