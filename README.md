@@ -118,19 +118,19 @@ The original 808-line spiritual vision has evolved into a **complete, production
 
 ## 🔮 Roadmap
 
-### Phase 1 (Q2 2025) – Website & dApp
+### Phase 1 (Q2 2026) – Website & dApp
 - [ ] Marketing website explaining the vision
 - [ ] Basic dApp with wallet connect
 - [ ] Website builder interface
 - [ ] Agent marketplace UI
 
-### Phase 2 (Q3 2025) – Decentralization
+### Phase 2 (Q3 2026) – Decentralization
 - [ ] P2P network layer (libp2p + Kademlia DHT)
 - [ ] Distributed Key Generation (DKG)
 - [ ] Validator staking incentives
 - [ ] Public testnet launch
 
-### Phase 3 (Q4 2025) – Mainnet
+### Phase 3 (Q4 2026) – Mainnet
 - [ ] Genesis block ceremony
 - [ ] Validator onboarding
 - [ ] First real DAOs using the system
