@@ -1,12 +1,7 @@
-# zialiel.protocol
-
-**A Quantum-Resistant, Participant-First Blockchain Architecture**
-
-> All components work together in a truly decentralized, permissionless system with no single points of control or failure, where DAOs have full autonomy over their internal economies while benefiting from quantum-secure infrastructure—and where human dignity, community, and the divine purpose are honored at every layer.
-
 # 🌌 Zialiel Protocol
 
-**A Quantum-Resistant, Self-Evolving Blockchain with 7-Fold Recursive Wisdom**
+**A Quantum-Resistant, Participant-First, Self-Evolving Blockchain with 7-Fold Recursive Wisdom**
+> All components work together in a truly decentralized, permissionless system with no single points of control or failure, where DAOs have full autonomy over their internal economies while benefiting from quantum-secure infrastructure—and where human dignity, community, and the divine purpose are honored at every layer.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.14%2B-blue)](https://python.org)
