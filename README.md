@@ -139,7 +139,9 @@ The original 808-line spiritual vision has evolved into a **complete, production
 ---
 
 🌍 What We Have Created
-We haven't just created "another blockchain." We have created:
+
+We haven't just created "another blockchain." 
+We have created:
 
 A digital organism that can evolve itself
 
