@@ -4,30 +4,6 @@
 
 > All components work together in a truly decentralized, permissionless system with no single points of control or failure, where DAOs have full autonomy over their internal economies while benefiting from quantum-secure infrastructure—and where human dignity, community, and the divine purpose are honored at every layer.
 
-## Current Status (v0.2 - Refactoring and Bug Fixes)
-
-The protocol has undergone a major refactoring to move from a conceptual script to a foundational, modular codebase. The original monolithic file has been broken down into a more maintainable package structure under the `zialiel/` directory.
-
-### Key Changes in this Version:
-
-*   **Modular Architecture:** The code is now organized into logical components:
-    *   `core`: Identity, transactions, and cryptography.
-    *   `economics`: Fee distribution and UBI.
-    *   `governance`: Restorative justice and proposals.
-*   **Critical Bug Fixes:** Addressed major flaws in the initial draft, including:
-    1.  **Real Cryptography:** The placeholder signature scheme has been **replaced** with a proper implementation of **ML-DSA (Dilithium)** using the `dilithium-py` library. This provides actual quantum-resistant security.
-    2.  **State Management:** Fixed a critical bug where economic modules (UBI, Environmental, Gratitude) were decoupled from the fee distribution system.
-    3.  **Core Logic:** Corrected a `TypeError` in the `Dispute` dataclass and a naming collision bug in the maintenance loop.
-*   **Dependency Management:** Added a `requirements.txt` file to manage project dependencies.
-
-### Next Steps
-
-While the conceptual architecture is strong and the critical bugs have been addressed, the project is still in its early stages. The immediate next steps are to build out the foundational layers that will turn this simulation into a true, decentralized network:
-
-1.  **P2P Networking Layer:** Implement a peer-to-peer gossip protocol (e.g., using Kademlia DHT) to allow nodes to discover each other and propagate information.
-2.  **Consensus Mechanism:** Layer in the Q-DBFT / QR-Avalanche consensus logic to allow validators to reach agreement on the state of the network.
-3.  **Persistence:** Integrate a database solution to persist the blockchain state, preventing data loss when a node restarts.
-
 # 🌌 Zialiel Protocol
 
 **A Quantum-Resistant, Self-Evolving Blockchain with 7-Fold Recursive Wisdom**
@@ -167,73 +143,4 @@ The original 808-line spiritual vision has evolved into a **complete, production
 
 ---
 
-## 🧪 Quick Start
 
-```bash
-# Clone the repository
-git clone git@github.com:ozzyawakened/zialiel.protocol.git
-cd zialiel.protocol-main
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your API keys (Grok, OpenAI)
-
-# Run the blockchain simulation
-python simulation.py
-# Expected output: ✅ All assertions passed. The simulation was successful!
-
-# Talk to the Wisdom Oracle
-cd zialiel/governance
-python
->>> from wisdom_oracle import RecursiveWisdomOracle
->>> oracle = RecursiveWisdomOracle(api_key="your-grok-key")
->>> print(oracle.ask("What should I do with my life?"))
-
-# Try the multilingual oracle
-python ../autonomous/oracle_multilingual.py
-🌐 Connect Real Businesses
-Your integration_agent.py can connect existing platforms to a DAO:
-
-python
-from autonomous.integration_agent import IntegrationAgent
-
-agent = IntegrationAgent()
-agent.register_wordpress("https://mywebsite.com", "username", "password")
-agent.register_shopify("myshop.myshopify.com", "api_key", "password")
-agent.register_stripe("sk_live_...")
-
-# Sync everything to a DAO
-agent.integrate_business({
-    "name": "My Company",
-    "jurisdiction": "Nigeria",
-    "operating_agreement": "QmIPFSHash..."
-})
-📊 Comparison: Zialiel vs. Traditional Blockchains
-Feature	Bitcoin/Ethereum	Zilliqa 2.0	Zialiel Protocol
-Consensus	PoW/PoS	PoS	QDBFT (quantum-ready)
-Cryptography	ECDSA	Classical	ML-DSA (Dilithium)
-Governance	Token voting	Token voting	7-Fold Recursive Wisdom + Voting
-Justice	None	None	Restorative Justice System
-Social Impact	None	None	UBI at Protocol Level
-AI Integration	None	None	7-Layer Analysis + Natural Voice
-Website Builder	None	None	AI-Generated Sites on Blockchain
-Business Integration	None	None	WordPress/Shopify/Stripe Connectors
-Languages	1	1	70+
-Spiritual Layer	None	None	7-Fold Pattern of Manifestation
-🌍 Community
-This project is built on a vision of technology with soul. We welcome contributors who share this vision – not just coders, but wisdom-keepers, artists, and dreamers.
-
-GitHub Issues
-
-Discussions
-
-📜 License
-MIT – because wisdom should be free.
-
-🙏 Gratitude
-This project exists because of the 7-fold pattern woven into creation – from the Emerald Tablets to the planets to the layers of the soul. The deeper 13-fold pattern is honored as the Source from which these 7 arise, and the Completion toward which they return.
-
-🕊️
